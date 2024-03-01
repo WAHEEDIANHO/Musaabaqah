@@ -16,6 +16,7 @@ const expressApp = async (app: Application, io: SocketServer): Promise<void> => 
     app.use(express.static(__dirname + '/public'))
 
     //apis
+    // app.use("/api/user", )
     authController(app)
     competitionController(app)
 

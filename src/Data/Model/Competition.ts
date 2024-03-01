@@ -5,6 +5,7 @@ import {ICompetition} from "../Dto/ICompetition";
 const schema = new Schema({
     name: { type: String, unique: true, required: true },
     question: { type: Number, required: true },
+    time: { type: Number, default: 0 },
     status: String,
     date: Date
 },

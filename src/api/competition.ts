@@ -24,6 +24,7 @@ export = (app: Application) => {
                     const competition: ICompetition = {
                         name: req.body.name,
                         question: req.body.question,
+                        time: req.body.time,
                         status: COMPETITION_STATUS.PENDING
                     }
                     await service.create(competition);

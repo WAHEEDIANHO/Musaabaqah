@@ -5,6 +5,7 @@ export interface ICompetition {
     id?: Types.ObjectId,
     name: string,
     question: number,
+    time: number,
     date?: Date | null,
     status: COMPETITION_STATUS,
 }

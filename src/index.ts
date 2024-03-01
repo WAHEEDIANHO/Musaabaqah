@@ -26,7 +26,7 @@ const StartServer = async() => {
     // await expressApp(app, channel);
 
 
-    httpServer.listen(Config.PORT, () => {
+    httpServer.listen(Config.PORT , () => {
         console.log(`listening to port ${Config.PORT}`);
     })
         .on('error', (err) => {

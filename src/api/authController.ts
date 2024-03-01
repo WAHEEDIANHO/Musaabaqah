@@ -1,6 +1,4 @@
 import {Application, NextFunction, Request, Response} from 'express'
-
-
 const authController = (app: Application) => {
 
     app.route("/auth")
@@ -8,6 +6,4 @@ const authController = (app: Application) => {
             res.json({msg: "jhksj"})
         });
 }
-
-
 export default authController;
