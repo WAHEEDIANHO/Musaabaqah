@@ -32,7 +32,7 @@ export = (io: Server) => {
              * Broadcast the question to the channel (made up of only judges)
              ***/
             try{
-                const { data: {juzs }} = await axios.get("https://api.quran.com/api/v4/juzs");
+                const { data: {juzs }}: { data : { juzs: any[] } } = await axios.get("https://api.quran.com/api/v4/juzs");
                 // console.log(juzs.length)
 
                 //     Generating question
@@ -45,16 +45,16 @@ export = (io: Server) => {
 
                 const randomNUmber = (min: number, max: number): number => Math.floor(Math.random() * ((max+1) - min) + min);
                 const questionGenerator =  (start: number, end: number, range_end: number): void => {
-                    const juz = randomNUmber(start, end);
-                    const chapter_in_juz = Object.keys(juzs[juz]["verse_mapping"]);
+                    const juz = randomNUmber(start, end); // (0-29)
+                    const chapter_in_juz = Object.keys(juzs[juzs.findIndex((x: any)  => x.juz_number == juz+1)]["verse_mapping"]);
                     const last_chapter = chapter_in_juz[chapter_in_juz.length-1];
                     const steps = Math.floor(Number(juzs[juz]["verses_count"])/no_of_question)
 
 
-                    const chapter = chapter_in_juz[randomNUmber(0, chapter_in_juz.length-1)];
+                    const chapter = chapter_in_juz[randomNUmber(0, chapter_in_juz.length-1)]; // (1-114)
                     if((juz===0 && chapter=="1") || (juz==29 && Number(chapter) > 100)) return questionGenerator(start, end, range_end)
-                    const x = Number(juzs[juz]["verse_mapping"][chapter].split("-")[0]) as number;
-                    const y = Number(juzs[juz]["verse_mapping"][chapter].split("-")[1]) as number;
+                    const x = Number(juzs[juzs.findIndex((x: any)  => x.juz_number == juz+1)]["verse_mapping"][chapter].split("-")[0]) as number;
+                    const y = Number(juzs[juzs.findIndex((x: any)  => x.juz_number == juz+1)]["verse_mapping"][chapter].split("-")[1]) as number;
                     const verse_select = randomNUmber(x, y);
 
                     // check here if verse selected is not exact surah that mark the end of the surah that end the juz
@@ -79,9 +79,9 @@ export = (io: Server) => {
                     }
 
                     questions.push({
-                        juz,
-                        chapter: Number(chapter),
-                        verse: verse_select,
+                        juz, // 0-29
+                        chapter: Number(chapter), // normal number start from 1
+                        verse: verse_select, // normal number start from 1
                         page: 0
                     })
                 }
@@ -104,7 +104,8 @@ export = (io: Server) => {
                     // Questions object
                     const { data: { verses } } = await axios.get(`https://api.quran.com/api/v4/quran/verses/uthmani_tajweed?juz_number=${juz+1}`);
                     const { data: { verse: { page_number } } } = await axios.get(`https://api.quran.com/api/v4/verses/by_key/${chapter}:${verse}`);
-                    const pos = verses.findIndex((el: any) => el.verse_key === `${chapter}:${verse}`);
+                    const pos = verses.findIndex((el: any) => el.verse_key == `${chapter}:${verse}`);
+                    console.log("verses", verses.length, juz+1, chapter, verse, pos);
                     questions[Number(posEl)].preview = verses.slice(pos, pos + 5);
                     questions[Number(posEl)].page = page_number;
                 }
@@ -122,7 +123,7 @@ export = (io: Server) => {
                         return -1
                     }
                 })
-                console.log(questions);
+                console.log("log question", questions);
 
                 io.to(args.room).emit(EVENT.GENERATE_QUESTION, {message: questions})
             }catch (e: any) {
